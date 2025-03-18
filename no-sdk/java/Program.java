@@ -2,26 +2,16 @@ package sigv4.signing;
 
 import sigv4.signing.samples.ApiGatewaySample;
 import sigv4.signing.samples.BedrockConverseSample;
+import sigv4.signing.samples.SESSample;
 
 public class Program {
     public static void main(String[] args) {
-
-        String region = System.getenv("AWS_DEFAULT_REGION") != null 
+        // 获取AWS默认区域，如果未设置则使用ap-northeast-1作为默认值
+        String region = System.getenv("AWS_DEFAULT_REGION") != null
             ? System.getenv("AWS_DEFAULT_REGION") 
-            : "us-east-1";
+            : "ap-northeast-1";
 
-        if (args.length == 0 || args[0].equals("ApiGatewaySample")) {
-            System.out.println("\n\n*****************API Gateway Sample*******************************");
-            String RESTAPIHOST = System.getenv("RESTAPIHOST");
-            String RESTAPIPATH = System.getenv("RESTAPIPATH");
-            ApiGatewaySample.run(region, RESTAPIHOST, RESTAPIPATH);
-        }
-
-        if (args.length == 0 || args[0].equals("BedrockConverseSample")) {
-            System.out.println("\n\n*****************Bedrock Converse Sample*******************************");
-            String modelId = "amazon.titan-text-express-v1";
-            String prompt = "What is the capital of England?";
-            BedrockConverseSample.run(region, modelId, prompt);
-        }
+        // 调用SESSample的run方法发送邮件
+        SESSample.run(region, "from_email_address@yourdomain.com", "rcpt@example.com", "The subject", "The body");
     }
 }

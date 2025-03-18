@@ -3,6 +3,8 @@ package sigv4.signing;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -15,14 +17,16 @@ import javax.crypto.spec.SecretKeySpec;
 public class AWSSigner {
     private static final String ALGORITHM = "AWS4-HMAC-SHA256";
 
-    public static String getAuthorizationHeader(String service, String region, String httpMethod, URI uri, ZonedDateTime now) {
+    public static String getAuthorizationHeader(String service, String region, String httpMethod, URI uri, Instant now) {
         return getAuthorizationHeader(service, region, httpMethod, uri, now, new HashMap<String, String>(), calculateHash(""));
     }
 
-    public static String getAuthorizationHeader(String service, String region, String httpMethod, URI uri, ZonedDateTime now,
+    public static String getAuthorizationHeader(String service, String region, String httpMethod, URI uri, Instant now,
                                                 Map<String, String> headers, String payloadHash) {
         String amzDate = toAmzDate(now);
-        String datestamp = now.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        ZoneId zone = ZoneId.of("GMT");
+
+        String datestamp = now.atZone(zone).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
         headers.putIfAbsent("host", uri.getHost());
         headers.putIfAbsent("x-amz-date", amzDate);
@@ -50,8 +54,10 @@ public class AWSSigner {
                 ", SignedHeaders=" + signedHeaders + ", Signature=" + signature;
     }
 
-    public static String toAmzDate(ZonedDateTime date) {
-        return date.format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'"));
+    public static String toAmzDate(Instant date) {
+        ZoneId zone = ZoneId.of("GMT");
+
+        return date.atZone(zone).format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'"));
         //return "20250214T131509Z";
     }
 

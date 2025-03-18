@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +16,7 @@ public class HttpHelpers {
 
     public static String get(String service, String region, String requestUrl) throws IOException, InterruptedException, URISyntaxException {
         URI uri = new URI(requestUrl);
-        ZonedDateTime now = ZonedDateTime.now();
+        Instant now = Instant.now();
         String amzDate = AWSSigner.toAmzDate(now);
 
         String authorizationHeader = AWSSigner.getAuthorizationHeader(service, region, "GET", uri, now);
@@ -40,7 +41,7 @@ public class HttpHelpers {
 
     public static String post(String service, String region, String requestUrl, String payload) throws IOException, InterruptedException, URISyntaxException {
         URI uri = new URI(requestUrl);
-        ZonedDateTime now = ZonedDateTime.now();
+        Instant now = Instant.now();
         String amzDate = AWSSigner.toAmzDate(now);
 
         String payloadHash = AWSSigner.calculateHash(payload);
